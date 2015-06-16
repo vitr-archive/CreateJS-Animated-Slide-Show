@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title></title>
+
+  <style>
+    body {overflow:hidden;border:0px;margin:0px;padding:0px;}
+  </style>
+
+  <script src="assets/js/createjs/easeljs-0.7.0.min.js"></script>
+  <script src="assets/js/createjs/tweenjs-0.5.0.min.js"></script>
+  <script src="assets/js/createjs/preloadjs-0.4.0.min.js"></script>
+  <script src="assets/js/createjs/soundjs-0.5.0.min.js"></script>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+
+  <link type="text/css" href="assets/css/style.css" rel="stylesheet" />
+
+  <script type="text/javascript" src="assets/js/app.min.js"></script>
+  <!--<script type="text/javascript" src="assets/js/app.js"></script>-->
+
+  <script>
+    var trackUrl = '/';
+//    var trackUrl = 'http://analytics.google.com/';
+    var imgPath = '';
+    var seekBarHeight = 24;
+    var controlButtonWidth = 32;
+    var originalPageWidth;
+    var originalPageHeight;
+
+    (function($) {
+
+      // function for extracting get parameters
+      $.QueryString = (function(a) {
+        if (a == "") return {};
+        var b = {};
+        for (var i = 0; i < a.length; ++i) {
+          var p=a[i].split('=');
+          if (p.length != 2)
+            continue;
+          b[p[0]] = decodeURIComponent(p[1].replace(/\+/g, " "));
+        }
+        return b;
+      })(window.location.search.substr(1).split('&'));
+    })(jQuery);
+
+    $(window).load(function() {
+
+    originalPageWidth = $(document).width();
+    originalPageHeight = $(document).height();
+
+// resize the canvas to fill browser window dynamically
+    window.addEventListener('resize', resizeCanvas, false);
+
+      function resizeCanvas() {
+        if(originalPageWidth === $(document).width() && originalPageWidth === $(document).width())
+        {
+          //console.log('resizeCanvas() has been aborted');
+          return false;
+        }
+        //console.log('resizeCanvas() has been triggered');
+        if (typeof timeline == 'undefined' || typeof timeline.position == 'undefined' )
+          return;
+        //drawStuff();
+//        console.log(timeline.position);
+//        location.reload();
+//        location.href = window.location.href + '?pos=' + timeline.position;
+//        location.href = 'http://vitaliy-ryepnoy/inventory/assets/moviestars_html5/cella/movie5.html' + '?pos=' + timeline.position;
+//        console.log(updateQueryStringParameter(updateQueryStringParameter(location.href, 'pos', Math.round(timeline.position)), 'autoplay', 1));
+        if (moviestars.paused)
+          autoplayParam = 0;
+        else
+          autoplayParam = 1;
+// disable for iphone6 compatability
+//        location.href = updateQueryStringParameter(updateQueryStringParameter(location.href, 'pos', Math.round(timeline.position)), 'autoplay', autoplayParam);
+        location.href = location.href;
+      }
+
+      drawStuff();
+
+function drawStuff() {
+  // it's safe to always use &forceaudioregen=1
+  xmlUrl = $.QueryString['xmlurl'];
+  pos = $.QueryString['pos'];
+//  console.log(pos);
+  if (!xmlUrl)
+    xmlUrl = 'json_source/?json=true'; //hyundai
+  else
+    xmlUrl = updateQueryStringParameter(xmlUrl, 'json', 'true');
+  // stat tracking param
+  edid = $.QueryString['edid'];
+  theme = $.QueryString['theme'];
+
+  canvasWidth = $.QueryString['w'];
+  ratio = $.QueryString['r'];
+  if (!ratio) {
+    ratio = [];
+    ratio[0] = 512;
+    ratio[1] = 384;
+  } else {
+    ratio = ratio.split("-");
+  }
+
+  if (!canvasWidth) {
+    tempRatio = Math.min(window.innerWidth / ratio[0], window.innerHeight / ratio[1]);
+    canvasWidth = tempRatio * ratio[0];
+//        canvasWidth = 512;
+//        canvasHeight = 384;
+  }
+//      $('#moviestars_loader').width(canvasWidth);
+//      canvasHeight = canvasWidth / (512/384);    // keeping aspect ratio
+  canvasHeight = canvasWidth / (ratio[0] / ratio[1]) - seekBarHeight;    // keeping aspect ratio
+//      canvasHeight = 360;    // keeping aspect ratio
+  $('#moviestars_loader').width(canvasWidth);
+  $('#moviestars_loader').height(canvasHeight);
+
+
+  $('#moviestars_track').width(canvasWidth - controlButtonWidth * 2);
+  $('#moviestars_track').css('top', canvasHeight + 'px');
+
+  $('#moviestars_volume').css('margin-left', canvasWidth - controlButtonWidth + 'px');
+  $('#moviestars_volume').css('top', canvasHeight + 'px');
+
+
+  $('#moviestars_play').css('top', canvasHeight + 'px');
+
+
+  $('#moviestars_canvasContainer').width(canvasWidth);
+  $('#moviestars_canvasContainer').height(canvasHeight);
+
+  $('#moviestars_canvas').width(canvasWidth);
+  $('#moviestars_canvas').height(canvasHeight);
+  $('#moviestars_canvas').attr('width', canvasWidth);
+  $('#moviestars_canvas').attr('height', canvasHeight);
+
+  // moviestars_imgLoader (image) preloader-logo.gif 320*51
+//  $('#moviestars_imgLoader').css('padding-left', Math.round((canvasWidth - $('#moviestars_imgLoader').width()) / 2) + 'px')
+//  $('#moviestars_imgLoader').css('padding-top', Math.round((canvasHeight - $('#moviestars_imgLoader').height()) / 2) + 'px')
+  // moviestars_txtLoader
+  $('#moviestars_txtLoader').css('padding-left', Math.round((canvasWidth - $('#moviestars_txtLoader').width()) / 2) + 'px')
+  $('#moviestars_txtLoader').css('padding-top', Math.round((canvasHeight - $('#moviestars_txtLoader').height()) / 2) + 'px')
+  /*
+      } else {
+        canvasWidth = 512;
+        canvasHeight = 384;
+        $('#moviestars_loader').width(canvasWidth);
+        $('#moviestars_loader').height(canvasHeight);
+        $('#moviestars_canvasContainer').width(canvasWidth);
+        $('#moviestars_canvasContainer').height(canvasHeight);
+        $('#moviestars_canvas').width(canvasWidth);
+        $('#moviestars_canvas').height(canvasHeight);
+      }
+*/
+  //carsguide specifics
+      if (edid==325) {
+        $('#moviestars_track').css('background-color', '#BDA3FF');
+        $('#moviestars_progress').css('background-color', '#8862D4');
+//        $('#moviestars_imgLoader').css('display', 'none');
+      } else if (theme=='hyundai.com.au') {
+//        $('#moviestars_track').css('background-color', '#FFFFFF');
+        $('#moviestars_track').css('background-color', '#b0b0b0');
+        $('#moviestars_progress').css('background-color', '#0a2972');
+      }
+      try {
+//        moviestars('autoload');
+        if ($.QueryString['autoplay'] == 1) {
+          $('#moviestars_loader').remove();
+          moviestars('autoload', 'autoplay');
+        }
+        else {
+          moviestars('autoload');
+        }
+      }
+      catch (e) {
+        if (e.message)
+          console.log('An error has occurred: ' + e.
+            message);
+        else
+          console.log('An error has occurred: ' + e);
+        window.location.href ='/';
+      }
+
+}
+    });
+
+   function updateQueryStringParameter(uri, key, value) {
+     var re = new RegExp("([?&])" + key + "=.*?(&|$)", "i");
+     var separator = uri.indexOf('?') !== -1 ? "&" : "?";
+     if (uri.match(re)) {
+       return uri.replace(re, '$1' + key + "=" + value + '$2');
+     }
+     else {
+       return uri + separator + key + "=" + value;
+     }
+   }
+
+    window.addEventListener("message", receiveMessage, false);
+    function receiveMessage(event)
+    {
+      if (!moviestars.paused && event.data.pause && typeof moviestars.player !== 'undefined') {
+        moviestars.player.playPause();
+      }
+    }
+
+  </script>
+
+
+</head>
+<body>
+  <div id="moviestars_loader">
+    <!--<img id="moviestars_imgLoader" src="assets/player/preloader-logo.gif">-->
+    <span id="moviestars_txtLoader">Loading...0%</span>
+    <span id="moviestars_reload">An error occurred. <button onclick="location.href = location.href;">RELOAD</button></span>
+  </div>
+
+  <div id="moviestars_play"></div>
+  <div id="moviestars_volume"></div>
+  <div id="moviestars_track" style="display: block;">
+    <div id="moviestars_progress"></div>
+    <label id="moviestars_posValue">0.00</label>
+    <img id="moviestars_slider" src="assets/player/slider.png" width="10" height="10" />
+  </div>
+
+  <div id="moviestars_canvasContainer">
+    <canvas id="moviestars_canvas" width="4" height="3">
+      Your browser does not support HTML5 Canvas.
+    </canvas>
+  </div>
+
+
+
+</body>
+</html>

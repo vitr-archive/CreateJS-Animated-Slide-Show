@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title></title>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script>
+    $(function(){
+      $('#pause').click(function(){
+        data = {pause: true};
+        document.getElementById("iframe").contentWindow.postMessage(data, '*');
+      });
+    });
+  </script>
+</head>
+<body>
+<!--<iframe id="iframe" width="100%" src="http://vitaliy-ryepnoy/inventory/assets/moviestars_html5/cella/movie5.html?ucnid=8865375&amp;xmlurl=http%3A%2F%2Fcars.hyundai.com.au%2Fxml_movie.php%2Fcars.hyundai.com.au_used_cars%2F8865375%2F&amp;r=16-9&amp;theme=hyundai.com.au" scrolling="no"></iframe>-->
+<iframe id="iframe" width="100%" src="assets/moviestars_html5/cella/movie5.html?ucnid=8865375&amp;xmlurl=http%3A%2F%2Fcars.hyundai.com.au%2Fxml_movie.php%2Fcars.hyundai.com.au_used_cars%2F8865375%2F&amp;r=16-9&amp;theme=hyundai.com.au" scrolling="no"></iframe>
+
+<button id="pause">pause</button>
+</body>
+</html>
